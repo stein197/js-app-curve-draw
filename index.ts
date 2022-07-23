@@ -40,8 +40,7 @@ function canvas_handler_pointerdown(e: PointerEvent): void {
 	if (!is_canvas(e.target))
 		return;
 	const p_event = point_create_from_event(e);
-	const p_existing = point_find_around(p_event, CIRCLE_RADIUS);
-	point_captured = p_existing;
+	point_captured = point_find_around(p_event, CIRCLE_RADIUS);
 	e.target.addEventListener("pointermove", canvas_handler_pointermove);
 }
 
