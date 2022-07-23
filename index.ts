@@ -22,7 +22,7 @@ type point = [
 	const c = window.document.body.querySelector("canvas");
 	if (!c)
 		throw new Error("Page does not have canvas element");
-	canvas_set(c);
+	canvas = c;
 	c.setAttribute("width", document.documentElement.clientWidth.toString());
 	c.setAttribute("height", document.documentElement.clientHeight.toString());
 	c.addEventListener("pointerdown", canvas_handler_pointerdown);
@@ -30,15 +30,11 @@ type point = [
 	const ctx = c.getContext("2d");
 	if (!ctx)
 		throw new Error("Cannot retrieve context for canvas");
-	context_set(ctx);
+	context = ctx;
 	ctx.fillStyle = STYLE_FILL;
 	ctx.strokeStyle = STYLE_STROKE;
 	ctx.lineWidth = STYLE_STROKE_WIDTH;
 })(window);
-
-function canvas_set(c: HTMLCanvasElement) {
-	canvas = canvas ?? c;
-}
 
 function canvas_handler_pointerdown(e: PointerEvent): void {
 	if (!is_canvas(e.target))
@@ -87,15 +83,6 @@ function canvas_handler_click(e: MouseEvent): void {
 
 function is_canvas(element: EventTarget | null): element is HTMLCanvasElement {
 	return element instanceof HTMLCanvasElement
-}
-
-
-function context_get(): CanvasRenderingContext2D {
-	return context;
-}
-
-function context_set(c: CanvasRenderingContext2D): void {
-	context = context ?? c;
 }
 
 function context_repaint(): void {
