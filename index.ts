@@ -25,18 +25,24 @@ type point = [
 	if (!c)
 		throw new Error("Page does not have canvas element");
 	canvas = c;
-	c.setAttribute("width", document.documentElement.clientWidth.toString());
-	c.setAttribute("height", document.documentElement.clientHeight.toString());
+	canvas_set_size(document);
 	c.addEventListener("pointerdown", canvas_handler_pointerdown);
 	c.addEventListener("pointerup", canvas_handler_pointerup);
+	window.addEventListener("resize", window_handler_resize);
 	const ctx = c.getContext("2d");
 	if (!ctx)
 		throw new Error("Cannot retrieve context for canvas");
 	context = ctx;
-	ctx.fillStyle = STYLE_FILL;
-	ctx.strokeStyle = STYLE_STROKE;
-	ctx.lineWidth = STYLE_STROKE_WIDTH;
+	context_set_style();
 })(window);
+
+function window_handler_resize(e: UIEvent): void {
+	if (!target_is_window(e.target))
+		return;
+	canvas_set_size(e.target.document);
+	context_set_style();
+	context_repaint();
+}
 
 function canvas_handler_pointerdown(e: PointerEvent): void {
 	if (!target_is_canvas(e.target))
@@ -87,8 +93,17 @@ function canvas_handler_click(e: MouseEvent): void {
 	context_repaint();
 }
 
+function canvas_set_size(document: Document): void {
+	canvas.setAttribute("width", document.documentElement.clientWidth.toString());
+	canvas.setAttribute("height", document.documentElement.clientHeight.toString());
+}
+
 function target_is_canvas(element: EventTarget | null): element is HTMLCanvasElement {
 	return element instanceof HTMLCanvasElement
+}
+
+function target_is_window(target: EventTarget | null): target is Window {
+	return target instanceof Window;
 }
 
 function context_repaint(): void {
@@ -100,6 +115,12 @@ function context_repaint(): void {
 
 function context_clear(): void {
 	context.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function context_set_style(): void {
+	context.fillStyle = STYLE_FILL;
+	context.strokeStyle = STYLE_STROKE;
+	context.lineWidth = STYLE_STROKE_WIDTH;
 }
 
 function point_add(p: point): void {
