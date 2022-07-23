@@ -39,7 +39,7 @@ type point = [
 })(window);
 
 function canvas_handler_pointerdown(e: PointerEvent): void {
-	if (!is_canvas(e.target))
+	if (!target_is_canvas(e.target))
 		return;
 	ptr_position_start = point_create_from_event(e);
 	p_captured = point_find_around(ptr_position_start, CIRCLE_RADIUS);
@@ -47,7 +47,7 @@ function canvas_handler_pointerdown(e: PointerEvent): void {
 }
 
 function canvas_handler_pointerup(e: PointerEvent): void {
-	if (!is_canvas(e.target))
+	if (!target_is_canvas(e.target))
 		return;
 	e.target.removeEventListener("pointermove", canvas_handler_pointermove);
 	p_captured = null;
@@ -64,7 +64,7 @@ function canvas_handler_pointermove(e: PointerEvent): void {
 	if (point_get_distance(p_event, ptr_position_start) <= POINTER_IDLE_RADIUS)
 		return;
 	ptr_moving = true;
-	if (!p_captured || !is_canvas(e.target))
+	if (!p_captured || !target_is_canvas(e.target))
 		return;
 	p_captured[0] = p_event[0];
 	p_captured[1] = p_event[1];
@@ -72,7 +72,7 @@ function canvas_handler_pointermove(e: PointerEvent): void {
 }
 
 function canvas_handler_click(e: MouseEvent): void {
-	if (!is_canvas(e.target))
+	if (!target_is_canvas(e.target))
 		return;
 	const p_event = point_create_from_event(e);
 	const p_existing = point_find_around(p_event, CIRCLE_RADIUS);
@@ -87,7 +87,7 @@ function canvas_handler_click(e: MouseEvent): void {
 	context_repaint();
 }
 
-function is_canvas(element: EventTarget | null): element is HTMLCanvasElement {
+function target_is_canvas(element: EventTarget | null): element is HTMLCanvasElement {
 	return element instanceof HTMLCanvasElement
 }
 
