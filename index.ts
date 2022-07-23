@@ -1,3 +1,4 @@
+const POINTER_IDLE_RADIUS = 10;
 const CIRCLE_RADIUS = 5;
 const BEZIER_SEGMENT_QUALITY = 10;
 const STYLE_FILL = "white";
@@ -9,6 +10,7 @@ const STYLE_ARC_ANGLE = Math.PI * 2;
 
 let canvas: HTMLCanvasElement;
 let context: CanvasRenderingContext2D;
+let pointer_position_start: point | null = null;
 let pointer_moving: boolean = false;
 let point_captured: point | null = null;
 const points: point[] = [];
@@ -39,8 +41,8 @@ type point = [
 function canvas_handler_pointerdown(e: PointerEvent): void {
 	if (!is_canvas(e.target))
 		return;
-	const p_event = point_create_from_event(e);
-	point_captured = point_find_around(p_event, CIRCLE_RADIUS);
+	pointer_position_start = point_create_from_event(e);
+	point_captured = point_find_around(pointer_position_start, CIRCLE_RADIUS);
 	e.target.addEventListener("pointermove", canvas_handler_pointermove);
 }
 
@@ -51,14 +53,19 @@ function canvas_handler_pointerup(e: PointerEvent): void {
 	point_captured = null;
 	if (!pointer_moving)
 		canvas_handler_click(e);
+	pointer_position_start = null;
 	pointer_moving = false;
 }
 
 function canvas_handler_pointermove(e: PointerEvent): void {
+	if (!pointer_position_start)
+		return;
+	const p_event = point_create_from_event(e);
+	if (point_get_distance(p_event, pointer_position_start) <= POINTER_IDLE_RADIUS)
+		return;
 	pointer_moving = true;
 	if (!point_captured || !is_canvas(e.target))
 		return;
-	const p_event = point_create_from_event(e);
 	point_captured[0] = p_event[0];
 	point_captured[1] = p_event[1];
 	context_repaint();
