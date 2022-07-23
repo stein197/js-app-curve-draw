@@ -1,7 +1,7 @@
 # Draw a Curve
 Simple demo where you can create an manipulate bezier curves of nth order.
 
-<center>![](demo.gif)</center>
+![](demo.gif)
 
 ## Installation
 1. Run `npm run build`
