@@ -1,0 +1,29 @@
+{
+  "name": "@stein197/app-curve-draw",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:dev": "tsc --lib ESNext,DOM --sourceMap index.ts",
+    "build": "tsc --lib ESNext,DOM --sourceMap --strict --noUnusedLocals --noUnusedParameters index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stein197/js-app-curve-draw.git"
+  },
+  "keywords": [
+    "bezier",
+    "curve",
+    "draw",
+    "app"
+  ],
+  "author": "Nail' Gafarov <nil20122013@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stein197/js-app-curve-draw/issues"
+  },
+  "homepage": "https://github.com/stein197/js-app-curve-draw#readme",
+  "devDependencies": {
+    "typescript": "4.7.4"
+  }
+}
