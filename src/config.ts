@@ -1,0 +1,9 @@
+export const POINTER_IDLE_RADIUS = 10;
+export const CIRCLE_RADIUS = 5;
+export const BEZIER_SEGMENT_QUALITY = 10;
+export const STYLE_FILL = "white";
+export const STYLE_STROKE = "black";
+export const STYLE_STROKE_WIDTH = 2;
+export const STYLE_LINE_DASH_DEFAULT: number[] = [];
+export const STYLE_LINE_DASH = [5, 5];
+export const STYLE_ARC_ANGLE = Math.PI * 2;

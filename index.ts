@@ -1,209 +1,24 @@
-const POINTER_IDLE_RADIUS = 10;
-const CIRCLE_RADIUS = 5;
-const BEZIER_SEGMENT_QUALITY = 10;
-const STYLE_FILL = "white";
-const STYLE_STROKE = "black";
-const STYLE_STROKE_WIDTH = 2;
-const STYLE_LINE_DASH_DEFAULT: number[] = [];
-const STYLE_LINE_DASH = [5, 5];
-const STYLE_ARC_ANGLE = Math.PI * 2;
-
-let canvas: HTMLCanvasElement;
-let context: CanvasRenderingContext2D;
-let ptr_position_start: point | null = null;
-let ptr_moving: boolean = false;
-let p_captured: point | null = null;
-const points: point[] = [];
-
-type point = [
-	x: number,
-	y: number
-];
+import * as canvas from "canvas";
+import * as context from "context";
 
 (function main(window: Window): void {
 	const c = window.document.body.querySelector("canvas");
 	if (!c)
 		throw new Error("Page does not have canvas element");
-	canvas = c;
-	canvas_set_size(document);
-	c.addEventListener("pointerdown", canvas_handler_pointerdown);
-	c.addEventListener("pointerup", canvas_handler_pointerup);
+	canvas.init(c);
+	canvas.set_size(window.innerWidth, window.innerHeight);
 	window.addEventListener("resize", window_handler_resize);
 	const ctx = c.getContext("2d");
 	if (!ctx)
 		throw new Error("Cannot retrieve context for canvas");
-	context = ctx;
-	context_set_style();
+	context.init(ctx);
+	context.set_style();
 })(window);
 
 function window_handler_resize(e: UIEvent): void {
-	if (!target_is_window(e.target))
+	if (!(e.target instanceof Window))
 		return;
-	canvas_set_size(e.target.document);
-	context_set_style();
-	context_repaint();
+	canvas.set_size(e.target.window.innerWidth, e.target.window.innerHeight);
+	context.set_style();
+	context.repaint();
 }
-
-function canvas_handler_pointerdown(e: PointerEvent): void {
-	if (!target_is_canvas(e.target))
-		return;
-	ptr_position_start = point_create_from_event(e);
-	p_captured = point_find_around(ptr_position_start, CIRCLE_RADIUS);
-	e.target.addEventListener("pointermove", canvas_handler_pointermove);
-}
-
-function canvas_handler_pointerup(e: PointerEvent): void {
-	if (!target_is_canvas(e.target))
-		return;
-	e.target.removeEventListener("pointermove", canvas_handler_pointermove);
-	p_captured = null;
-	if (!ptr_moving)
-		canvas_handler_click(e);
-	ptr_position_start = null;
-	ptr_moving = false;
-}
-
-function canvas_handler_pointermove(e: PointerEvent): void {
-	if (!ptr_position_start)
-		return;
-	const p_event = point_create_from_event(e);
-	if (point_get_distance(p_event, ptr_position_start) <= POINTER_IDLE_RADIUS)
-		return;
-	ptr_moving = true;
-	if (!p_captured || !target_is_canvas(e.target))
-		return;
-	p_captured[0] = p_event[0];
-	p_captured[1] = p_event[1];
-	context_repaint();
-}
-
-function canvas_handler_click(e: MouseEvent): void {
-	if (!target_is_canvas(e.target))
-		return;
-	const p_event = point_create_from_event(e);
-	const p_existing = point_find_around(p_event, CIRCLE_RADIUS);
-	if (p_existing) {
-		point_remove(p_existing);
-		context_repaint();
-		return;
-	}
-	if (ptr_moving)
-		return;
-	point_add(p_event);
-	context_repaint();
-}
-
-function canvas_set_size(document: Document): void {
-	canvas.setAttribute("width", document.documentElement.clientWidth.toString());
-	canvas.setAttribute("height", document.documentElement.clientHeight.toString());
-}
-
-function target_is_canvas(element: EventTarget | null): element is HTMLCanvasElement {
-	return element instanceof HTMLCanvasElement
-}
-
-function target_is_window(target: EventTarget | null): target is Window {
-	return target instanceof Window;
-}
-
-function context_repaint(): void {
-	context_clear();
-	bezier_draw(context, points);
-	polyline_draw(context, points);
-	circle_draw_array(context, points);
-}
-
-function context_clear(): void {
-	context.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-function context_set_style(): void {
-	context.fillStyle = STYLE_FILL;
-	context.strokeStyle = STYLE_STROKE;
-	context.lineWidth = STYLE_STROKE_WIDTH;
-}
-
-function point_add(p: point): void {
-	points.push(p);
-}
-
-function point_remove(p: point): void {
-	const i = points.indexOf(p);
-	if (i >= 0)
-		points.splice(i, 1);
-}
-
-function point_create_from_event(e: MouseEvent): point {
-	return [
-		e.clientX,
-		e.clientY
-	];
-}
-
-function point_find_around(p: point, r: number): point | null {
-	for (let i = points.length - 1; i >= 0; i--) {
-		const point = points[i];
-		if (point_get_distance(point, p) <= r)
-			return point;
-	}
-	return null;
-}
-
-function point_get_last(): point | null {
-	return points.length ? points[points.length - 1] : null;
-}
-
-function point_get_distance(p1: point, p2: point): number {
-	return Math.sqrt((p2[0] - p1[0]) ** 2 + (p2[1] - p1[1]) ** 2);
-}
-
-function circle_draw_array(c: CanvasRenderingContext2D, points: point[]): void {
-	for (const point of points) {
-		c.beginPath();
-		c.arc(point[0], point[1], CIRCLE_RADIUS, 0, STYLE_ARC_ANGLE);
-		c.fill();
-		c.stroke();
-		c.closePath();
-	}
-}
-
-function polyline_draw(c: CanvasRenderingContext2D, points: point[]): void {
-	if (points.length <= 1)
-		return;
-	let point_prev = points[0];
-	c.setLineDash(STYLE_LINE_DASH);
-	c.beginPath();
-	c.moveTo(point_prev[0], point_prev[1]);
-	for (let i = 1; i < points.length; i++)
-		c.lineTo(points[i][0], points[i][1]);
-	c.stroke();
-	c.closePath();
-	c.setLineDash(STYLE_LINE_DASH_DEFAULT);
-}
-
-function bezier_draw(c: CanvasRenderingContext2D, points: point[]): void {
-	if (points.length <= 1)
-		return;
-	c.beginPath();
-	c.moveTo(points[0][0], points[0][1]);
-	const step = 1 / (BEZIER_SEGMENT_QUALITY * (points.length - 1));
-	for (let t = 0; t <= 1; t += step) {
-		const p_at = bezier_point_at(t, points);
-		c.lineTo(p_at[0], p_at[1]);
-	}
-	c.lineTo(points[points.length - 1][0], points[points.length - 1][1]);
-	c.stroke();
-}
-
-function bezier_point_at(t: number, points: point[]): point {
-	let result: point = [0, 0];
-	const n = points.length - 1;
-	for (let k = 0; k <= n; k++) {
-		const Pk = points[k];
-		for (let j = 0; j < Pk.length; j++)
-			result[j] += Pk[j] * (f(n) / (f(k) * f(n - k))) * (t ** k) * ((1 - t) ** (n - k))
-	}
-	return result;
-}
-
-const f: (n: number) => number = n => (n > 0 ? n : 1) * (n > 1 ? f(n - 1) : 1);
