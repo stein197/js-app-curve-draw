@@ -4,10 +4,7 @@ import * as point from "point";
 export function draw(c: CanvasRenderingContext2D, points: point.point[]): void {
 	if (points.length <= 1)
 		return;
-	const now = new Date;
 	const bezier = create(points);
-	// @ts-ignore
-	console.log(`bezier.draw(): points amount: ${config.BEZIER_SEGMENT_QUALITY * (points.length - 1)}, time: ${new Date() - now}ms`);
 	c.beginPath();
 	c.moveTo(bezier[0][0], bezier[0][1]);
 	for (const p of bezier)
