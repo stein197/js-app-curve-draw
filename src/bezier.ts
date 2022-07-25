@@ -1,28 +1,40 @@
 import * as config from "config";
 import * as point from "point";
-import * as util from "util";
 
 export function draw(c: CanvasRenderingContext2D, points: point.point[]): void {
 	if (points.length <= 1)
 		return;
+	const now = new Date;
+	const bezier = create(points);
+	// @ts-ignore
+	console.log(`bezier.draw(): points amount: ${config.BEZIER_SEGMENT_QUALITY * (points.length - 1)}, time: ${new Date() - now}ms`);
 	c.beginPath();
-	c.moveTo(points[0][0], points[0][1]);
-	const step = 1 / (config.BEZIER_SEGMENT_QUALITY * (points.length - 1));
-	for (let t = 0; t <= 1; t += step) {
-		const p_at = point_at(t, points);
-		c.lineTo(p_at[0], p_at[1]);
-	}
-	c.lineTo(points[points.length - 1][0], points[points.length - 1][1]);
+	c.moveTo(bezier[0][0], bezier[0][1]);
+	for (const p of bezier)
+		c.lineTo(p[0], p[1]);
 	c.stroke();
 }
 
-function point_at(t: number, points: point.point[]): point.point {
-	let result: point.point = [0, 0];
-	const n = points.length - 1;
-	for (let k = 0; k <= n; k++) {
-		const Pk = points[k];
-		for (let j = 0; j < Pk.length; j++)
-			result[j] += Pk[j] * (util.factorial(n) / (util.factorial(k) * util.factorial(n - k))) * (t ** k) * ((1 - t) ** (n - k))
-	}
+function create(points: point.point[]): point.point[] {
+	if (points.length <= 2)
+		return points.map(p => [...p]);
+	const segment_count = config.BEZIER_SEGMENT_QUALITY * (points.length - 1);
+	const result: point.point[] = new Array(segment_count + 1);
+	const step = 1 / segment_count;
+	for (let i = 0; i < segment_count; i++)
+		result[i] = point_at(i * step, points);
+	result[result.length - 1] = points[points.length - 1];
 	return result;
+}
+
+function point_at(t: number, points: point.point[]): point.point {
+	points = points.slice();
+	while (points.length > 1) {
+		const n = points.length - 1;
+		for (let i = 0; i < n; i++) {
+			points[i] = point.interpolate(points[i], points[i + 1], t);
+		}
+		points.pop();
+	}
+	return points[0];
 }

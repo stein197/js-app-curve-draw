@@ -22,3 +22,10 @@ export function find_around(p: point, r: number, points: point[]): point | null 
 export function get_distance(p1: point, p2: point): number {
 	return Math.sqrt((p2[0] - p1[0]) ** 2 + (p2[1] - p1[1]) ** 2);
 }
+
+export function interpolate(p1: point, p2: point, t: number): point {
+	return [
+		p1[0] + (p2[0] - p1[0]) * t,
+		p1[1] + (p2[1] - p1[1]) * t
+	];
+}
