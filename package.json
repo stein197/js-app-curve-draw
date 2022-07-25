@@ -3,10 +3,6 @@
   "version": "0.1.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "build:dev": "tsc --lib ESNext,DOM --sourceMap index.ts",
-    "build": "tsc --lib ESNext,DOM --sourceMap --strict --noUnusedLocals --noUnusedParameters index.ts"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/stein197/js-app-curve-draw.git"
