@@ -21,5 +21,8 @@
   "homepage": "https://github.com/stein197/js-app-curve-draw#readme",
   "devDependencies": {
     "typescript": "4.7.4"
+  },
+  "dependencies": {
+    "requirejs": "2.3.6"
   }
 }

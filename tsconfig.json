@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+		"baseUrl": "src",
+		"sourceMap": true,
+		"module": "AMD",
+		"outFile": "index.js",
+		"strict": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true
+	},
+	"files": [
+		"index.ts"
+	]
+}
