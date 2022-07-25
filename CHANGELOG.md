@@ -1,7 +1,7 @@
 # CHANGELOG
 ## [Unreleased]
 - Split the code into modules
-- Cache calculated bezier points to save reduce calculations on window resize event
+- Memoize `bezier.create()` function.
 - [?] Simplify bezier calculations by removing redundant factorials (see building animation)
 - Add animation to show how the curve is being built
 
