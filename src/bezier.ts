@@ -1,13 +1,19 @@
 import * as config from "config";
 import * as point from "point";
 
+let cache: point.point[] | null = null;
+
+export function cache_reset(): void {
+	cache = null;
+}
+
 export function draw(c: CanvasRenderingContext2D, points: point.point[]): void {
 	if (points.length <= 1)
 		return;
-	const bezier = create(points);
+	cache = cache ?? create(points);
 	c.beginPath();
-	c.moveTo(bezier[0][0], bezier[0][1]);
-	for (const p of bezier)
+	c.moveTo(cache[0][0], cache[0][1]);
+	for (const p of cache)
 		c.lineTo(p[0], p[1]);
 	c.stroke();
 }

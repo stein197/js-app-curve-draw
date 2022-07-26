@@ -1,3 +1,4 @@
+import * as bezier from "bezier";
 import * as config from "config";
 import * as context from "context";
 import * as point from "point";
@@ -62,6 +63,7 @@ function handler_pointermove(e: PointerEvent): void {
 		return;
 	p_captured[0] = p_event[0];
 	p_captured[1] = p_event[1];
+	bezier.cache_reset();
 	context.repaint();
 }
 
@@ -78,6 +80,7 @@ function handler_click(e: MouseEvent): void {
 	if (ptr_moving)
 		return;
 	add_point(p_event);
+	bezier.cache_reset();
 	context.repaint();
 }
 
